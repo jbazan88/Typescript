@@ -1,4 +1,4 @@
-## Sistema de Gestión de Biblioteca
+## Sistema de Gestión de Libreria
 
 ### Estructura
 - Dominio: entidades  y casos de uso
