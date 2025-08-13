@@ -1,61 +1,54 @@
-import { Book } from "../entities/Book";
-import { Cart } from "../entities/Cart";
 import { Order, OrderStatus } from "../entities/Order";
 import { User } from "../entities/User";
+import { Cart } from "../entities/Cart";
+import { OrderRepository } from "../repositories/OrderRepository";
+import { BookRepository } from "../repositories/BookRepository";
 
 export class OrderUseCase {
-  private booksDB: Book[] = [];
-  private ordersDB: Order[] = [];
+  constructor(
+    private orderRepository: OrderRepository,
+    private bookRepository: BookRepository
+  ) {}
 
-  constructor(initialBooks: Book[]) {
-    this.booksDB = initialBooks;
-  }
-
-  processNewOrder(user: User, cart: Cart[]): Order {
+  async processNewOrder(user: User, cart: Cart[]): Promise<Order> {
     if (cart.length === 0) {
       throw new Error("El carrito está vacío. No se puede procesar la orden.");
     }
 
     for (const item of cart) {
-      const bookInDB = this.booksDB.find(b => b.id === item.libro.id);
-      if (!bookInDB || bookInDB.stock < item.cantidad) {
+      const bookInDB = await this.bookRepository.findById(item.libro.id);
+      if (!bookInDB || (bookInDB.stock ?? 0) < item.cantidad) {
         throw new Error(`Stock insuficiente para el libro "${item.libro.titulo}".`);
       }
     }
 
     let orderTotal = 0;
     for (const item of cart) {
-      const bookInDB = this.booksDB.find(b => b.id === item.libro.id);
+      const bookInDB = await this.bookRepository.findById(item.libro.id);
       if (bookInDB) {
-        bookInDB.stock -= item.cantidad;
+        await this.bookRepository.update({
+          ...bookInDB,
+          stock: (bookInDB.stock ?? 0) - item.cantidad,
+        });
         orderTotal += item.libro.precio * item.cantidad;
       }
     }
 
-    const newOrder: Order = {
-      id: `order-${Date.now()}`,
+    const newOrder = await this.orderRepository.save({
       usuario: user,
       items: cart,
       total: orderTotal,
-      fecha: new Date(),
       estado: "pendiente",
-    };
+    });
 
-    this.ordersDB.push(newOrder);
-
-    console.log(`Orden ${newOrder.id} creada con éxito para el usuario ${user.name}.`);
     return newOrder;
   }
 
-  updateOrderStatus(orderId: string, newStatus: OrderStatus): void {
-    const order = this.ordersDB.find(o => o.id === orderId);
-    if (!order) {
-      throw new Error("Orden no encontrada.");
-    }
-    console.log(`Estado de la orden ${orderId} actualizado a ${newStatus}.`);
+  async updateOrderStatus(orderId: string, newStatus: OrderStatus): Promise<Order> {
+    return this.orderRepository.updateStatus(orderId, newStatus);
   }
 
-  getUserOrders(userId: string): Order[] {
-    return this.ordersDB.filter(order => order.usuario.id === userId);
+  async getUserOrders(userId: string): Promise<Order[]> {
+    return this.orderRepository.findByUser(userId);
   }
 }
