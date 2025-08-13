@@ -5,7 +5,7 @@ import cors from "cors";
 import { BookUseCase } from "../../../domain/src/use-cases/BookUseCase";
 import { CartUseCase } from "../../../domain/src/use-cases/CartUseCase";
 import { OrderUseCase } from "../../../domain/src/use-cases/OrderUseCase";
-import { UserAdminUseCase } from "../../../domain/src/use-cases/UserUseCase";
+import { UserAdminUseCase } from "../../../domain/src/use-cases/user/UserUseCase";
 import { Book } from "../../../domain/src/entities/Book";
 import { User } from "../../../domain/src/entities/User";
 
