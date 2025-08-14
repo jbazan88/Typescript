@@ -231,7 +231,64 @@ app.get("/api/autores", async (req, res) => {
   res.json(authors);
 });
 
-// Puedes agregar endpoints para pedidos y carrito según tus casos de uso
+// Endpoints para carrito
+app.get("/api/carrito/:userId", async (req, res) => {
+  try {
+    const items = await cartUseCase.getCartItems(req.params.userId);
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener el carrito" });
+  }
+});
+
+app.post("/api/carrito/:userId", async (req, res) => {
+  try {
+    const { libro, cantidad } = req.body;
+    await cartUseCase.addBookToCart(req.params.userId, libro, cantidad);
+    res.status(204).send();
+  } catch (error) {
+    res.status(400).json({ error: error instanceof Error ? error.message : "Error al agregar libro al carrito" });
+  }
+});
+
+app.delete("/api/carrito/:userId/:bookId", async (req, res) => {
+  try {
+    await cartUseCase.removeBookFromCart(req.params.userId, req.params.bookId);
+    res.status(204).send();
+  } catch (error) {
+    res.status(400).json({ error: error instanceof Error ? error.message : "Error al eliminar libro del carrito" });
+  }
+});
+
+// Endpoints para órdenes
+app.post("/api/ordenes", async (req, res) => {
+  try {
+    const { usuario, items } = req.body;
+    const order = await orderUseCase.processNewOrder(usuario, items);
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(400).json({ error: error instanceof Error ? error.message : "Error al procesar la orden" });
+  }
+});
+
+app.get("/api/ordenes/usuario/:userId", async (req, res) => {
+  try {
+    const orders = await orderUseCase.getUserOrders(req.params.userId);
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener órdenes del usuario" });
+  }
+});
+
+app.patch("/api/ordenes/:orderId/estado", async (req, res) => {
+  try {
+    const { estado } = req.body;
+    const order = await orderUseCase.updateOrderStatus(req.params.orderId, estado);
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({ error: error instanceof Error ? error.message : "Error al actualizar estado de la orden" });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
