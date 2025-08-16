@@ -26,13 +26,13 @@ export class OrderUseCase {
     for (const item of cart) {
       const bookInDB = await this.bookRepository.findById(item.libro.id);
       if (bookInDB) {
-        await this.bookRepository.update({
-          ...bookInDB,
-          stock: (bookInDB.stock ?? 0) - item.cantidad,
+        await this.bookRepository.update(bookInDB.id, {
+            ...bookInDB,
+            stock: (bookInDB.stock ?? 0) - item.cantidad,
         });
         orderTotal += item.libro.precio * item.cantidad;
-      }
     }
+}
 
     const newOrder = await this.orderRepository.save({
       usuario: user,
