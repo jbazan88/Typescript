@@ -22,7 +22,7 @@ export interface BookRepository {
    * Actualiza un libro existente.
    * @param book El objeto libro con las propiedades a actualizar.
    */
-  update(book: Partial<Book>): Promise<Book>;
+  update(id: string, bookData: Partial<Book>): Promise<Book>;
 
   /**
    * Elimina un libro por su ID.

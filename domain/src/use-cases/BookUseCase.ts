@@ -17,7 +17,7 @@ export class BookUseCase {
   }
 
   async updateBook(id: string, updateData: Partial<Omit<Book, "id">>) {
-    return this.bookRepository.update({ id, ...updateData });
+    return this.bookRepository.update(id, updateData);
   }
 
   async deleteBook(id: string) {

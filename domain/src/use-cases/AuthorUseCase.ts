@@ -17,7 +17,7 @@ export class AuthorUseCase {
   }
 
   async updateAuthor(id: string, updateData: Partial<Omit<Author, "id">>) {
-    return this.authorRepository.update({ id, ...updateData });
+    return this.authorRepository.update(id, updateData);
   }
 
   async deleteAuthor(id: string) {
