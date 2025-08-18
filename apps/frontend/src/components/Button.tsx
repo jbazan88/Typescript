@@ -1,28 +1,12 @@
 import React from 'react';
 
-// Define las propiedades (props) que el componente Button puede recibir
 interface ButtonProps {
-  /**
-   * Texto que se mostrará dentro del botón.
-   */
   label: string;
-  /**
-   * Manejador de eventos que se ejecuta al hacer clic en el botón.
-   */
   onClick: () => void;
-  /**
-   * Estilo del botón, por ejemplo 'primary' o 'secondary'.
-   */
   styleType?: 'primary' | 'secondary' | 'danger';
-  /**
-   * Estado deshabilitado del botón.
-   */
   disabled?: boolean;
 }
 
-/**
- * Componente de botón reutilizable.
- */
 export const Button: React.FC<ButtonProps> = ({ label, onClick, styleType = 'primary', disabled = false }) => {
   const baseClasses = "py-2 px-4 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-colors duration-200";
 
