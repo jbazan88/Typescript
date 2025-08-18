@@ -9,16 +9,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - DB_HOST=database
-      - DB_PORT=5432
-      - DB_NAME=${DB_NAME:-myapp}
-      - DB_USER=${DB_USER:-admin}
-      - DB_PASSWORD=${DB_PASSWORD:-password123}
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
     networks:
       - app-network
-    depends_on:
-      - database
     volumes:
       - ./apps/backend/src:/app/backend/src
       - ./domain:/app/domain
