@@ -9,6 +9,13 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-myapp}
+      - DB_USER=${DB_USER:-user}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+    depends_on:
+      - database
     networks:
       - app-network
     volumes:
@@ -19,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/frontend/Dockerfile
-    ports:  
+    ports:
       - "5173:80"
     depends_on:
       - backend
@@ -28,6 +35,24 @@ services:
     environment:
       - REACT_APP_API_URL=http://localhost:3000
 
+  database:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME:-myapp}
+      - POSTGRES_USER=${DB_USER:-user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-data:
+    driver: local
